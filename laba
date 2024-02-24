@@ -1,0 +1,44 @@
+def digit_to_words(digit)
+    digits_mapping = {
+        '0': 'ноль',
+        '1': 'один',
+        '2': 'два',
+        '3': 'три',
+        '4': 'четыре',
+        '5': 'пять',
+        '6': 'шесть',
+        '7': 'семь',
+        '8': 'восемь',
+        '9': 'девять'
+    }
+    return digits_mapping.get(digit, "")
+def process_lexeme(lexeme):
+    if not lexeme.isdigit() or '0' not in lexeme:
+        return None  
+    zero_count = lexeme.count('0')
+    return ' '.join([digit_to_words('0') for _ in range(zero_count)])
+def read_and_process_file(file_path, chunk_size=1024):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            chunk = ""
+            while True:
+                next_chunk = file.read(chunk_size)
+                chunk += next_chunk
+                if not next_chunk:
+                    for lexeme in chunk.split():
+                        result = process_lexeme(lexeme)
+                        if result:
+                            print(result)
+                    break
+                last_space = chunk.rfind(' ')
+                lexemes, chunk = chunk[:last_space].split(), chunk[last_space+1:]
+                for lexeme in lexemes:
+                    result = process_lexeme(lexeme)
+                    if result:
+                        print(result)
+    except FileNotFoundError:
+        print(f"Файл {file_path} не найден.")
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+file_path = "your_file_path_here.txt"  
+read_and_process_file(file_path)
