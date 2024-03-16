@@ -1,0 +1,78 @@
+import random
+
+def create_empty_matrix(N):
+    return [[0] * N for _ in range(N)]
+
+def generate_random_matrix(N):
+    return [[random.randint(-10, 10) for _ in range(N//2)] for _ in range(N//2)]
+
+def create_matrix_from_submatrices(B, C, D, E):
+    top_half = [B[i] + C[i] for i in range(len(B))]
+    bottom_half = [D[i] + E[i] for i in range(len(D))]
+    return top_half + bottom_half
+
+def transpose(matrix):
+    return [[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))]
+
+def matrix_multiply(A, B):
+    result = create_empty_matrix(len(A))
+    for i in range(len(A)):
+        for j in range(len(B[0])):
+            for k in range(len(B)):
+                result[i][j] += A[i][k] * B[k][j]
+    return result
+
+def matrix_subtract(A, B):
+    return [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
+
+def scalar_multiply(K, matrix):
+    return [[K * element for element in row] for row in matrix]
+
+K = int(input("Введите K: "))
+N = int(input("Введите N(чётное): "))
+
+B = generate_random_matrix(N)
+C = generate_random_matrix(N)
+D = generate_random_matrix(N)
+E = generate_random_matrix(N)
+
+A = create_matrix_from_submatrices(B, C, D, E)
+
+F = create_empty_matrix(N) 
+
+def check_condition_and_modify_matrices(B, C, D, E):
+    zero_rows_count = sum(all(cell == 0 for i, cell in enumerate(row) if i % 2 == 0) for row in B)
+
+    positive_sum = sum(
+        cell for row in E for i, cell in enumerate(row) if i % 2 == 0 and cell > 0 and E.index(row) % 2 == 0)
+
+    if zero_rows_count > positive_sum:
+        new_C = [row[:len(C) // 2][::-1] + row[len(C) // 2:] for row in C]
+        new_C = [list(row) for row in zip(*new_C)] 
+        return B, new_C, D, E
+    else:
+        return B, E, D, C
+
+B, C, D, E = check_condition_and_modify_matrices(B, C, D, E)
+
+F = create_matrix_from_submatrices(B, C, D, E)
+
+F = create_matrix_from_submatrices(B, C, D, E)
+
+KF = scalar_multiply(K, F)
+KA = scalar_multiply(K, A)
+AT = transpose(A)
+KAT = scalar_multiply(K, AT)
+
+temp_result = matrix_multiply(KF, A)
+final_result = matrix_subtract(temp_result, KAT)
+
+print("Матрица A:")
+for row in A:
+    print(row)
+print("\nМатрица F:")
+for row in F:
+    print(row)
+print("\nРезультат выражения ((K*F)*A) - (K * AT):")
+for row in final_result:
+    print(row)
