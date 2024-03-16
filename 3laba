@@ -42,7 +42,7 @@ def scalar_multiply(K, matrix):
     return [[K * element for element in row] for row in matrix]
 
 K = int(input("Введите K: "))
-N = int(input("Введите N(чётное): "))
+N = int(input("Введите N: "))
 
 B = generate_random_matrix(N)
 C = generate_random_matrix(N)
