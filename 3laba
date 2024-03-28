@@ -27,20 +27,37 @@ def compute_expression(K, F, A):
     KF = matrix_multiply([[K * x for x in row] for row in F], A)
     KA_T = matrix_multiply([[K * x for x in row] for row in transpose(A)], A)
     return [[KF[i][j] - KA_T[i][j] for j in range(len(A))] for i in range(len(A))]
+def summ_of_zero(matrix):
+    summ = 0
+    for i in range(len(matrix)//2):
+        for j in range(i+1,len(matrix)-(i+1),2):
+            if matrix[i][j] == 0:
+                summ += 1
+    return summ
+def summ_of_positive_digits(matrix):
+    count = 0
+    for i in range(len(matrix)//2,len(matrix),2):
+        for j in range(len(matrix)-(i+1)+1,i):
+            if matrix[i][j] % 2==0:
+                count += 1
+    return count
+def swap_of_oreas(matrix):
+    for j in range(len(matrix)//2):
+        for i in range(j+1,len(matrix)-(j+1)):
+            matrix[i][j] , matrix[j][i] = matrix[j][i] , matrix[i][j]
+    return matrix
 K = int(input("Введите K: "))
 N = int(input("Введите N: "))
 A = generate_matrix(N)
-s1 = sum(A[i][j] for i in range(N) for j in range(i))
-s2 = sum(A[i][j] for i in range(N) for j in range(i + 1, N))
-s3 = sum(A[i][j] for i in range(N//2) for j in range(i + 1)) + \
-     sum(A[i][j] for i in range(N//2, N) for j in range(N - i, N))
-F = [[0] * N for _ in range(N)]
-for i in range(N):
-    for j in range(N):
-        if i >= j:
-            F[i][j] = s1
-        else:
-            F[i][j] = s2
+B = [[A[i][j] for j in range(N//2)] for i in range(N//2)]
+C = [[A[i][j] for j in range(N//2,N)] for i in range(N//2)]
+E = [[A[i][j] for j in range(N//2,N)] for i in range(N//2,N)]
+D = [[A[i][j] for j in range(N//2)] for i in range(N//2,N)]
+if summ_of_zero(B) > summ_of_positive_digits(B):
+        swap_of_oreas(C)
+else:
+        C,B = B,C
+F = [B[i] + C[i] for i in range(N//2)] + [D[i] + E[i] for i in range(N//2)] + [A[N-1] for i in range(1)]
 result = compute_expression(K, F, A)
 print("Матрица A:")
 for row in A:
