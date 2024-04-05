@@ -1,21 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 def generate_matrix(N):
     A = np.zeros((N, N), dtype=int)
+
     B = np.random.randint(-10, 11, size=(N // 2, N // 2))
     C = np.random.randint(-10, 11, size=(N // 2, N // 2))
     D = np.random.randint(-10, 11, size=(N // 2, N // 2))
     E = np.random.randint(-10, 11, size=(N // 2, N // 2))
+
     A[:N // 2, :N // 2] = B
     A[:N // 2, -(N // 2):] = C
     A[N // 2:, :N // 2] = D
     A[N // 2:, -(N // 2):] = E
     return A
+
 def plot_matrix(matrix, title):
     plt.imshow(matrix, cmap='viridis')
     plt.colorbar()
     plt.title(title)
     plt.show()
+
 def generate_F(A):
     F = np.copy(A)
     zero_rows_count = np.sum(np.all(A[::2, ::2] == 0, axis=1))
@@ -25,17 +30,21 @@ def generate_F(A):
     else:
         F[:, 0], F[:, 2] = F[:, 2], F[:, 0]
     return F
+
 def main(K, N):
     A = generate_matrix(N)
     print("Matrix A:")
     print(A)
     plot_matrix(A, "Matrix A")
+
     F = generate_F(A)
     print("Matrix F:")
     print(F)
     plot_matrix(F, "Matrix F")
+
     det_A = np.linalg.det(A)
     diag_sum_F = np.trace(F)
+
     if det_A > diag_sum_F:
         if np.linalg.det(F) == 0:
             print("Матрица F сингулярна. Невозможно обратить.")
@@ -44,9 +53,11 @@ def main(K, N):
     else:
         G = np.tril(A)
         result = (A.T + G - F.T) * K
+
     print("Result:")
     print(result)
     plot_matrix(result, "Result")
+
 if __name__ == "__main__":
     K = int(input("Введите значение K: "))
     N = int(input("Введите значение N: "))
