@@ -34,9 +34,23 @@ def generate_matrix(N):
     A[:N // 2, -(N // 2):] = C
     A[N // 2:, :N // 2] = D
     A[N // 2:, -(N // 2):] = E
+
     return A
 
-def plot_matrix(matrix, title):
+def plot_linear(matrix, title):
+    plt.plot(matrix.flatten())
+    plt.title(title)
+    plt.show()
+
+def plot_bar(matrix, title):
+    flattened_matrix = matrix.flatten()
+    n = len(flattened_matrix)
+    plt.bar(np.arange(n), flattened_matrix)
+    plt.title(title)
+    plt.xticks(np.arange(n), np.arange(n) + 1)  # Добавляем метки для столбцов
+    plt.show()
+
+def plot_thermogram(matrix, title):
     plt.imshow(matrix, cmap='viridis')
     plt.colorbar()
     plt.title(title)
@@ -44,27 +58,30 @@ def plot_matrix(matrix, title):
 
 def generate_F(A):
     F = np.copy(A)
+
     zero_rows_count = np.sum(np.all(A[::2, ::2] == 0, axis=1))
     even_rows_sum = np.sum(A[::2][A[::2] > 0])
     if zero_rows_count > even_rows_sum:
-        F[:, 1], F[:, 2] = F[:, 2], F[:, 1] 
+        F[:, 1], F[:, 2] = F[:, 2], F[:, 1] # Меняем местами E и C симметрично
     else:
-        F[:, 0], F[:, 2] = F[:, 2], F[:, 0]
+        F[:, 0], F[:, 2] = F[:, 2], F[:, 0] # Меняем местами B и E несимметрично
+
     return F
 
 def main(K, N):
+
     A = generate_matrix(N)
     print("Matrix A:")
     print(A)
-    plot_matrix(A, "Matrix A")
+    plot_linear(A, "Matrix A (Linear)")
 
     F = generate_F(A)
     print("Matrix F:")
     print(F)
-    plot_matrix(F, "Matrix F")
+    plot_bar(F, "Matrix F (Bar)")
 
-    det_A = np.linalg.det(A)
-    diag_sum_F = np.trace(F)
+    det_A = np.linalg.det(A) # Вычисление определителя матрицы A
+    diag_sum_F = np.trace(F) # Вычисление суммы диагональных элементов матрицы F
 
     if det_A > diag_sum_F:
         if np.linalg.det(F) == 0:
@@ -77,9 +94,11 @@ def main(K, N):
 
     print("Result:")
     print(result)
-    plot_matrix(result, "Result")
+    plot_thermogram(result, "Result (Thermogram)")
 
 if __name__ == "__main__":
+
     K = int(input("Введите значение K: "))
     N = int(input("Введите значение N: "))
+    # Запуск основной функции
     main(K, N)
