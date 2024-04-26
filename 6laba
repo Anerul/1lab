@@ -1,0 +1,81 @@
+"""
+Задание состоит из двух частей. 
+1 часть – написать программу в соответствии со своим вариантом задания. Написать 2 варианта формирования (алгоритмический и с помощью функций Питона), сравнив по времени их выполнение.
+2 часть – усложнить написанную программу, введя по своему усмотрению в условие минимум одно ограничение на характеристики объектов (которое будет сокращать количество переборов)  и целевую функцию для нахождения оптимального  решения.
+Вывести все натуральные числа до n, в записи которых встречается не более 2 четных цифр.
+"""
+import timeit
+from itertools import product
+
+def is_valid_number(number):
+    even_count = 0
+    for digit in str(number):
+        if int(digit) % 2 == 0:
+            even_count += 1
+        if even_count > 2:
+            return False
+    return True
+
+def algorithmic_approach(n):
+    return [number for number in range(1, n + 1) if is_valid_number(number)]
+
+def has_fewer_than_three_evens(digits):
+    return sum(1 for d in digits if int(d) % 2 == 0) <= 2
+
+def itertools_approach(n):
+    valid_numbers = []
+    for number_length in range(1, len(str(n)) + 1):
+        for digits in product('0123456789', repeat=number_length):
+            if digits[0] != '0' and has_fewer_than_three_evens(digits):
+                number = int(''.join(digits))
+                if number <= n:
+                    valid_numbers.append(number)
+    return valid_numbers
+
+def algorithmic_approach_divisible_by_5(n):
+    return [number for number in range(5, n + 1, 5) if is_valid_number(number)]
+
+def itertools_approach_divisible_by_5(n):
+    valid_numbers = []
+    for number_length in range(1, len(str(n)) + 1):
+        for digits in product('0123456789', repeat=number_length):
+            if digits[0] != '0' and has_fewer_than_three_evens(digits) and digits[-1] in '05':
+                number = int(''.join(digits))
+                if number <= n:
+                    valid_numbers.append(number)
+    return valid_numbers
+
+n = int(input("Введите число n: "))
+
+alg_start_time = timeit.default_timer()
+alg_result = algorithmic_approach(n)
+alg_time = timeit.default_timer() - alg_start_time
+
+itertools_start_time = timeit.default_timer()
+itertools_result = itertools_approach(n)
+itertools_time = timeit.default_timer() - itertools_start_time
+
+alg_div_5_start_time = timeit.default_timer()
+alg_div_5_result = algorithmic_approach_divisible_by_5(n)
+alg_div_5_time = timeit.default_timer() - alg_div_5_start_time
+
+itertools_div_5_start_time = timeit.default_timer()
+itertools_div_5_result = itertools_approach_divisible_by_5(n)
+itertools_div_5_time = timeit.default_timer() - itertools_div_5_start_time
+
+print(f"Алгоритмический подход: {alg_time} секунд, результат: {alg_result}","\n")
+print(f"Подход с itertools: {itertools_time} секунд, результат: {itertools_result}","\n")
+print(f"Усложненный алгоритмический подход (числа кратные 5): {alg_div_5_time} секунд, результат: {alg_div_5_result}","\n")
+print(f"Усложненный подход с itertools (числа кратные 5): {itertools_div_5_time} секунд, результат: {itertools_div_5_result}","\n")
+
+if alg_time < itertools_time:
+    print(f"Алгоритмический подход быстрее подхода с itertools на {itertools_time - alg_time} секунд.","\n")
+else:
+    print(f"Подход с itertools быстрее алгоритмического подхода на {alg_time - itertools_time} секунд.","\n")
+
+if alg_div_5_time < itertools_div_5_time:
+    print(f"Усложненный алгоритмический подход (числа кратные 5) быстрее подхода с itertools на {itertools_div_5_time - alg_div_5_time} секунд.","\n")
+else:
+    print(f"Усложненный подход с itertools (числа кратные 5) быстрее алгоритмического подхода на {alg_div_5_time - itertools_div_5_time} секунд.","\n")
+
+
