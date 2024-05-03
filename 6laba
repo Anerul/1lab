@@ -45,6 +45,10 @@ def itertools_approach_divisible_by_5(n):
                     valid_numbers.append(number)
     return valid_numbers
 
+def find_optimal_number(numbers):
+    # Возвращает максимальное число из списка, как оптимальное решение
+    return max(numbers) if numbers else None
+
 n = int(input("Введите число n: "))
 
 alg_start_time = timeit.default_timer()
@@ -78,4 +82,5 @@ if alg_div_5_time < itertools_div_5_time:
 else:
     print(f"Усложненный подход с itertools (числа кратные 5) быстрее алгоритмического подхода на {alg_div_5_time - itertools_div_5_time} секунд.","\n")
 
-
+print(f"Оптимальное число для усложненного алгоритмического подхода (числа кратные 5): {optimal_alg_div_5}")
+print(f"Оптимальное число для усложненного подхода с itertools (числа кратные 5): {optimal_itertools_div_5}")
