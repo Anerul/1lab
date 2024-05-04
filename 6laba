@@ -82,5 +82,10 @@ if alg_div_5_time < itertools_div_5_time:
 else:
     print(f"Усложненный подход с itertools (числа кратные 5) быстрее алгоритмического подхода на {alg_div_5_time - itertools_div_5_time} секунд.","\n")
 
+# Поиск оптимального числа для алгоритмического подхода
+optimal_alg_div_5 = find_optimal_number(alg_div_5_result)
+# Поиск оптимального числа для подхода с itertools
+optimal_itertools_div_5 = find_optimal_number(itertools_div_5_result)
+
 print(f"Оптимальное число для усложненного алгоритмического подхода (числа кратные 5): {optimal_alg_div_5}")
 print(f"Оптимальное число для усложненного подхода с itertools (числа кратные 5): {optimal_itertools_div_5}")
