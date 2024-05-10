@@ -1,0 +1,111 @@
+"""
+Требуется для своего варианта второй части л.р. №6 (усложненной программы) разработать реализацию с использованием графического интерфейса.
+Допускается использовать любую графическую библиотеку питона.  
+Рекомендуется использовать внутреннюю библиотеку питона  tkinter.
+В программе должны быть реализованы минимум одно окно ввода, одно окно вывода (со скролингом), одно текстовое поле, одна кнопка.
+Вывести все натуральные числа до n, в записи которых встречается не более 2 четных цифр. (Усложнение: числа должны быть кратны 5, оптимальное число: наибольшее удовлетворяющее условиям)
+"""
+import tkinter as tk
+from tkinter import scrolledtext, Toplevel
+import timeit
+from itertools import product
+
+
+def is_valid_number(number):
+    even_count = 0
+    for digit in str(number):
+        if int(digit) % 2 == 0:
+            even_count += 1
+        if even_count > 2:
+            return False
+    return True
+
+
+def algorithmic_approach_divisible_by_5(n):
+    return [number for number in range(5, n + 1, 5) if is_valid_number(number)]
+
+
+def has_fewer_than_three_evens(digits):
+    return sum(1 for d in digits if int(d) % 2 == 0) <= 2
+
+
+def itertools_approach_divisible_by_5(n):
+    valid_numbers = []
+    for number_length in range(1, len(str(n)) + 1):
+        for digits in product('0123456789', repeat=number_length):
+            if digits[0] != '0' and has_fewer_than_three_evens(digits) and digits[-1] in '05':
+                number = int(''.join(digits))
+                if number <= n:
+                    valid_numbers.append(number)
+    return valid_numbers
+
+
+def find_optimal_number(numbers):
+    return max(numbers) if numbers else None
+
+
+def show_optimal_solution(optimal_number):
+    optimal_window = Toplevel(root)
+    optimal_window.title("Оптимальное решение")
+    optimal_message = tk.Label(optimal_window, text=f"Оптимальное число: {optimal_number}", font=("Helvetica", 14))
+    optimal_message.pack(pady=20, padx=20)
+    center_window(optimal_window)
+
+
+def calculate():
+    n = int(entry.get())
+    output_area.delete(1.0, tk.END)
+
+    if method_var.get() == "alg":
+        start_time = timeit.default_timer()
+        result = algorithmic_approach_divisible_by_5(n)
+        elapsed_time = timeit.default_timer() - start_time
+        optimal_number = find_optimal_number(result)
+        output_area.insert(tk.END,
+                           f"Алгоритмический подход (числа кратные 5): {elapsed_time:.6f} секунд, результат: {result}\n")
+    elif method_var.get() == "itertools":
+        start_time = timeit.default_timer()
+        result = itertools_approach_divisible_by_5(n)
+        elapsed_time = timeit.default_timer() - start_time
+        optimal_number = find_optimal_number(result)
+        output_area.insert(tk.END,
+                           f"Подход с itertools (числа кратные 5): {elapsed_time:.6f} секунд, результат: {result}\n")
+
+    show_optimal_solution(optimal_number)
+
+
+def center_window(window):
+    window.update_idletasks()
+    width = window.winfo_width()
+    height = window.winfo_height()
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    x = int((screen_width / 2) - (width / 2))
+    y = int((screen_height / 2) - (height / 2))
+    window.geometry(f'{width}x{height}+{x}+{y}')
+
+
+root = tk.Tk()
+root.title("Усложнённые подходы: числа с не более чем двумя четными цифрами, кратные 5")
+
+entry_label = tk.Label(root, text="Введите число n:")
+entry_label.pack()
+
+entry = tk.Entry(root)
+entry.pack()
+
+method_var = tk.StringVar(value="alg")
+alg_radio = tk.Radiobutton(root, text="Алгоритмический подход", variable=method_var, value="alg")
+alg_radio.pack()
+
+itertools_radio = tk.Radiobutton(root, text="Подход с itertools", variable=method_var, value="itertools")
+itertools_radio.pack()
+
+calculate_button = tk.Button(root, text="Вычислить", command=calculate)
+calculate_button.pack()
+
+output_area = scrolledtext.ScrolledText(root, width=70, height=20)
+output_area.pack()
+
+center_window(root)
+root.mainloop()
