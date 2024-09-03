@@ -1,0 +1,106 @@
+import tkinter as tk
+from tkinter import filedialog, messagebox
+import matplotlib.pyplot as plt
+import csv
+
+
+class Tour:
+    def __init__(self, destination, tour_type, manager):
+        self.destination = destination
+        self.tour_type = tour_type
+        self.manager = manager
+
+    @classmethod
+    def from_string(cls, data_string):
+        parts = data_string.split(',')
+        if len(parts) != 3:
+            raise ValueError("Неверный формат данных: " + data_string)
+        return cls(parts[0].strip(), parts[1].strip(), parts[2].strip())
+
+    def __str__(self):
+        return f"Путевка: {self.destination}, Тип отдыха: {self.tour_type}, Менеджер: {self.manager}"
+
+
+class TourManager:
+    def __init__(self):
+        self.tours = []
+
+    def load_tours(self, filename):
+        with open(filename, 'r', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                try:
+                    tour = Tour.from_string(','.join(row))
+                    self.tours.append(tour)
+                except ValueError as e:
+                    messagebox.showerror("Ошибка", str(e))
+
+    def segment_by_type(self):
+        segments = {}
+        for tour in self.tours:
+            segments[tour.tour_type] = segments.get(tour.tour_type, 0) + 1
+        return segments
+
+    def segment_by_manager(self):
+        segments = {}
+        for tour in self.tours:
+            segments[tour.manager] = segments.get(tour.manager, 0) + 1
+        return segments
+
+
+def visualize_segments(segments, title, width=8, height=6):
+    labels = segments.keys()
+    sizes = segments.values()
+
+    fig, ax = plt.subplots(figsize=(width, height))
+    fig.canvas.manager.set_window_title(title)
+
+    window = fig.canvas.manager.window
+    window.update_idletasks()
+    window.geometry(
+        f'+{(window.winfo_screenwidth() - width * 100) // 2}+{(window.winfo_screenheight() - height * 100) // 2}')
+
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+    plt.title(title)
+    plt.show()
+
+
+def load_and_segment_by_type():
+    filename = filedialog.askopenfilename(title="Выберите файл с путевками")
+    if filename:
+        manager.load_tours(filename)
+        segments = manager.segment_by_type()
+        visualize_segments(segments, "Сегментация путевок по типу отдыха", width=10,
+                           height=8)
+
+
+def load_and_segment_by_manager():
+    filename = filedialog.askopenfilename(title="Выберите файл с путевками")
+    if filename:
+        manager.load_tours(filename)
+        segments = manager.segment_by_manager()
+        visualize_segments(segments, "Сегментация путевок по менеджерам", width=10,
+                           height=8)
+
+
+def center_window(window, width, height):
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    x = (screen_width - width) // 2
+    y = (screen_height - height) // 2
+    window.geometry(f'{width}x{height}+{x}+{y}')
+
+
+manager = TourManager()
+
+root = tk.Tk()
+root.title("Туристические путевки")
+
+window_width = 400
+window_height = 200
+center_window(root, window_width, window_height)
+
+tk.Button(root, text="Сегментация по типу отдыха", command=load_and_segment_by_type).pack(pady=10)
+tk.Button(root, text="Сегментация по менеджерам", command=load_and_segment_by_manager).pack(pady=10)
+
+root.mainloop()
